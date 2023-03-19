@@ -20,7 +20,16 @@ function clear() {
   display.textContent = '0';
 }
 
+function roundNumber(number) {
+  const precision = 1000000;
+  return Math.round(number * precision) / precision;
+}
+
 function operate() {
+  if (rightOperand === null) {
+    return; 
+  }
+
   switch(operator) {
     case '+':
       result = leftOperand + rightOperand;
@@ -36,6 +45,7 @@ function operate() {
       break;
   }
   
+  result = roundNumber(result);
   display.textContent = result.toString();
   
   // Set the state of the calculator for the next operation
@@ -44,14 +54,15 @@ function operate() {
   rightOperand = null;
 }
 
-
 clearButton.addEventListener('click', clear);
+
 decimalButton.addEventListener('click', () => {
   if (!decimalPressed) {
     decimalPressed = true;
     display.textContent += '.';
   }
 });
+
 numberButtons.forEach(button => {
   button.addEventListener('click', () => {
     if (operator) {
@@ -73,11 +84,20 @@ numberButtons.forEach(button => {
     }
   });
 });
+
 operatorButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      operator = button.textContent;
-      decimalPressed = false;
-    });
+  button.addEventListener('click', () => {
+    if (operator && rightOperand !== null) {
+      operate();
+    }
+    operator = button.textContent;
+    decimalPressed = false;
   });
-  equalsButton.addEventListener('click', operate);
-  
+});
+
+equalsButton.addEventListener('click', () => {
+  if (operator && rightOperand !== null) {
+    operate();
+  }
+});
+
